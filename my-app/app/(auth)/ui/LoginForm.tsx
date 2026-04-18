@@ -1,63 +1,100 @@
-'use client'
+"use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useActionState } from "react";
-import { login, type AuthActionState } from "../actions";
-import { AuthField } from "./AuthField";
-import { AuthSubmit } from "./AuthSubmit";
+import { useMemo, useState, useTransition } from "react";
+import AuthField from "./AuthField";
+import AuthSubmit from "./AuthSubmit";
 
-const initialState: AuthActionState = { ok: false, message: "" };
+type Json = Record<string, unknown> | null;
 
 export function LoginForm() {
-  const [state, formAction] = useActionState(login, initialState);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = useMemo(
+    () => {
+      const raw = searchParams.get("next");
+      if (!raw) return "/";
+      if (!raw.startsWith("/") || raw.startsWith("//")) return "/";
+      return raw;
+    },
+    [searchParams]
+  );
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(formData: FormData) {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (!backendUrl) {
+      setError("Missing NEXT_PUBLIC_BACKEND_URL in env.");
+      return;
+    }
+
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+
+    setError(null);
+
+    const res = await fetch(`${backendUrl}/api/users/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
+
+    let data: Json = null;
+    try {
+      data = (await res.json()) as Json;
+    } catch {
+      data = null;
+    }
+
+    if (!res.ok) {
+      const message =
+        (data && typeof data === "object" && typeof data.message === "string"
+          ? data.message
+          : null) || "Login failed.";
+      setError(message);
+      return;
+    }
+
+    router.push(nextPath);
+    router.refresh();
+  }
 
   return (
-    <form action={formAction} className="mt-6 space-y-4">
+    <form
+      action={(formData) => startTransition(() => onSubmit(formData))}
+      className="flex flex-col gap-4"
+    >
       <AuthField
         id="email"
-        label="Email"
         name="email"
+        label="Email"
         type="email"
-        placeholder="demo@site.com"
         autoComplete="email"
         required
-        error={state.fieldErrors?.email}
       />
       <AuthField
         id="password"
-        label="Password"
         name="password"
+        label="Password"
         type="password"
-        placeholder="Your password"
         autoComplete="current-password"
         required
-        error={state.fieldErrors?.password}
       />
 
-      <div className="flex items-center justify-between">
-        <label className="inline-flex items-center gap-2 text-sm text-zinc-700">
-          <input
-            name="remember"
-            type="checkbox"
-            className="h-4 w-4 rounded border-black/20"
-          />
-          Remember me
-        </label>
-        <span className="text-sm text-zinc-500">Forgot password? (sample)</span>
-      </div>
+      {error ? (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      ) : null}
 
-      <p aria-live="polite" className={`text-sm ${state.ok ? "text-emerald-700" : "text-zinc-600"}`}>
-        {state.message}
-      </p>
+      <AuthSubmit pending={pending}>Login</AuthSubmit>
 
-      <AuthSubmit label="Sign in" />
-
-      <p className="pt-2 text-sm text-zinc-700">
-        New here?{" "}
-        <Link className="font-semibold text-zinc-900 underline underline-offset-4" href="/register">
-          Create an account
-        </Link>
-      </p>
+      <Link className="text-sm text-zinc-600 underline" href="/register">
+        Need an account?
+      </Link>
     </form>
   );
 }

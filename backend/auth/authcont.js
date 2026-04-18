@@ -9,12 +9,14 @@ const generateToken = (userId) => {
   );
 };
 
+const isProd = process.env.NODE_ENV === "production";
+
 // cookie options (important for cross-domain)
 const cookieOptions = {
   httpOnly: true,
-  secure: true,        // MUST be true in production (HTTPS)
-  sameSite: 'none',    // required if frontend & backend are different domains
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  secure: isProd, // HTTPS only in production
+  sameSite: isProd ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
 // REGISTER

@@ -1,51 +1,20 @@
-'use client'
+import type { InputHTMLAttributes } from "react";
 
-type Props = {
-  id: string;
+type Props = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
-  name: string;
-  type?: string;
-  placeholder?: string;
-  autoComplete?: string;
-  error?: string;
-  required?: boolean;
 };
 
-export function AuthField({
-  id,
-  label,
-  name,
-  type = "text",
-  placeholder,
-  autoComplete,
-  error,
-  required,
-}: Props) {
+export default function AuthField({ label, id, ...props }: Props) {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-zinc-900">
+    <div className="flex flex-col gap-2">
+      <label className="text-sm font-medium text-zinc-900" htmlFor={id}>
         {label}
       </label>
       <input
         id={id}
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        required={required}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className={`mt-2 block w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-zinc-900 shadow-sm outline-none transition focus:ring-2 ${
-          error
-            ? "border-rose-300 focus:border-rose-400 focus:ring-rose-200"
-            : "border-black/10 focus:border-blue-400 focus:ring-blue-200"
-        }`}
+        className="h-11 rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none ring-0 placeholder:text-zinc-400 focus:border-zinc-900"
+        {...props}
       />
-      {error ? (
-        <p id={`${id}-error`} className="mt-2 text-xs text-rose-700">
-          {error}
-        </p>
-      ) : null}
     </div>
   );
 }

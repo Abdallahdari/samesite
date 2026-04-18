@@ -1,17 +1,21 @@
-'use client'
+"use client";
 
-import { useFormStatus } from "react-dom";
+import type { ReactNode } from "react";
 
-export function AuthSubmit({ label }: { label: string }) {
-  const { pending } = useFormStatus();
-
+export default function AuthSubmit({
+  pending,
+  children,
+}: {
+  pending: boolean;
+  children: ReactNode;
+}) {
   return (
     <button
       type="submit"
       disabled={pending}
-      className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+      className="h-11 rounded-xl bg-zinc-900 px-4 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
     >
-      {pending ? "Working..." : label}
+      {pending ? "Please wait..." : children}
     </button>
   );
 }

@@ -1,28 +1,24 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { RegisterForm } from "../ui/RegisterForm";
 
-export const metadata: Metadata = {
-  title: "Register",
-  description: "Sample registration page",
-};
-
 export default function RegisterPage() {
   return (
-    <div>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">Create your account</h1>
-          <p className="mt-1 text-sm text-zinc-600">
-            A lightweight sample registration form (no persistence).
-          </p>
-        </div>
-        <Link className="text-sm font-medium text-zinc-700 underline underline-offset-4" href="/">
-          Home
-        </Link>
-      </div>
+    <div className="flex flex-col gap-6">
+      <header className="flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          Register
+        </h1>
+        <p className="text-sm text-zinc-600">Create an account to continue.</p>
+      </header>
 
       <RegisterForm />
+
+      <p className="text-sm text-zinc-600">
+        Already have an account?{" "}
+        <Link className="font-medium text-zinc-900 underline" href="/login">
+          Login
+        </Link>
+      </p>
     </div>
   );
 }
