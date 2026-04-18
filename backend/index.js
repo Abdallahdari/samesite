@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const cookieparser=require('cookie-parser');
 const app = express();
+const cors=require('cors');
 app.use(express.json());
 app.use(cookieparser());
 const userRoutes = require('./routes/userRoutes.js');
