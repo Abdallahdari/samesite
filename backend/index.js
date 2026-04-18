@@ -8,7 +8,7 @@ const cookieparser=require('cookie-parser');
 const app = express();
 const cors=require('cors');
 app.use(cors({
-    origin: 'http://localhost:3001', // frontend URL
+    origin: 'https://samesite-wdk8.vercel.app', // frontend URL
     credentials: true // allow cookies
 }));
 app.use(express.json());
